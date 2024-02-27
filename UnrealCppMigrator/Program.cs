@@ -44,7 +44,7 @@ namespace UnrealCppMigrator
             var apiMacros2Module = moduleDirs.ToDictionary(
                 x => x.Name.ToUpperInvariant() + "_API",
                 x => x.Name);
-            var detectedMigrations = new Dictionary<SourceType, Tuple<string, string>>();
+            var detectedMigrations = new Dictionary<Tuple<string, string>,SourceType>();
 
             SourceType FindSourceType(string declaration)
             {
@@ -74,7 +74,7 @@ namespace UnrealCppMigrator
                     var type = FindSourceType(typeMatch.Value);
                     var from = $"{originModule}.{fileName}";
                     var to = $"{moduleName}.{fileName}";
-                    detectedMigrations.Add(type, new Tuple<string,string>(from, to));
+                    detectedMigrations.Add(new Tuple<string,string>(from, to),type);
                     var replaced = headerText.Replace(match.Value, moduleName.ToUpperInvariant() + "_API");
                     File.WriteAllText(header.FullName, replaced);
                     // add redirect
@@ -113,7 +113,7 @@ namespace UnrealCppMigrator
             
             foreach (var detectedMigration in detectedMigrations)
             {
-                Console.WriteLine($"[{detectedMigration.Key}] {detectedMigration.Value.Item1}  =>  {detectedMigration.Value.Item2}");
+                Console.WriteLine($"[{detectedMigration.Value}] {detectedMigration.Key.Item1}  =>  {detectedMigration.Key.Item2}");
             }
         }
     }
